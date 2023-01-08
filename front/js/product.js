@@ -29,7 +29,6 @@ getProduct(productId).then((product) => {
 
 const addItem = (quantity, colors) => {
   if (!colors) return alert('Une couleur doit être fournie');
-  debugger;
   const _quantity = parseInt(quantity, 10);
   let cart = JSON.parse(storage.getItem('cart')) || [];
 
