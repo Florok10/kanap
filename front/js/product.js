@@ -29,21 +29,29 @@ getProduct(productId).then((product) => {
 
 const addItem = (quantity, colors) => {
   if (!colors) return alert('Une couleur doit être fournie');
+  debugger;
   const _quantity = parseInt(quantity, 10);
   let cart = JSON.parse(storage.getItem('cart')) || [];
 
-  const product =
-    cart.find((item) => item.id === productId && item.colors === colors) || {};
+  const productIndex = cart.findIndex(
+    (item) => item.id === productId && item.colors === colors
+  );
+
+  const product = cart[productIndex] || {};
 
   if (!product.id) product.id = productId;
   product.quantity = (product.quantity || 0) + _quantity;
   product.colors = colors;
 
-  cart = cart.filter(
-    (item) => !(item.id === productId && item.colors === colors)
-  );
-  const updatedCart = [...cart, product];
-  storage.setItem('cart', JSON.stringify(updatedCart));
+  switch (productIndex) {
+    case -1: {
+      storage.setItem('cart', JSON.stringify([...cart, product]));
+      break;
+    }
+    default: {
+      storage.setItem('cart', JSON.stringify(cart));
+    }
+  }
 };
 
 addButtonTag.addEventListener('click', (e) => {
