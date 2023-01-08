@@ -1,11 +1,18 @@
 const itemsTag = document.getElementById('items');
 
-const getProducts = async () => {
+/**
+ * Fetch the products from our back-end api
+ * @returns array
+ */
+const fetchProducts = async () => {
   const response = await fetch('http://localhost:3000/api/products');
   return response.json();
 };
 
-getProducts()
+/**
+ * After fetching the products, render each product found in the DOM
+ */
+fetchProducts()
   .then((products) => {
     itemsTag.innerHTML = '';
     products.forEach((product) => {

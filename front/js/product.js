@@ -11,22 +11,35 @@ const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const productId = urlParams.get('id');
 
-const getProduct = async (id) => {
+/**
+ * Fetch the product with the given id
+ * @param {string} id
+ * @returns Promise<array | undefined>
+ */
+const fetchProduct = async (id) => {
   const response = await fetch(`http://localhost:3000/api/products/${id}`);
   return response.json();
 };
 
-getProduct(productId).then((product) => {
+/**
+ * After fetching the product, set the tags' content
+ */
+fetchProduct(productId).then((product) => {
   document.title = product.name;
   imgTag.innerHTML = `<img src="${product.imageUrl}" alt="${product.altTxt}" >`;
-  titleTag.innerHTML = product.name;
-  priceTag.innerHTML = product.price;
-  descriptionTag.innerHTML = product.description;
+  titleTag.textContent = product.name;
+  priceTag.textContent = product.price;
+  descriptionTag.textContent = product.description;
   product.colors.forEach((color) => {
     selectColorsTag.innerHTML += `<option value="${color}">${color}</option>`;
   });
 });
 
+/**
+ * Group the items in the given cart by their id
+ * @param {{id: string, colors: string, quantity: number | string}[]} cart
+ * @returns array
+ */
 const groupItems = (cart) => {
   cartReduced = cart.reduce((group, item) => {
     const { id } = item;
@@ -40,6 +53,12 @@ const groupItems = (cart) => {
   return newCart;
 };
 
+/**
+ * Add an item to the cart
+ * @param {string} quantity
+ * @param {string} colors
+ * @returns void
+ */
 const addItem = (quantity, colors) => {
   if (!colors) return alert('Une couleur doit être fournie');
   const _quantity = parseInt(quantity, 10);
