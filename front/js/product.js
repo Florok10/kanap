@@ -27,6 +27,19 @@ getProduct(productId).then((product) => {
   });
 });
 
+const groupItems = (cart) => {
+  cartReduced = cart.reduce((group, item) => {
+    const { id } = item;
+    group[id] = group[id] ?? [];
+    group[id].push(item);
+    return group;
+  }, {});
+  const newCart = Object.values(cartReduced).reduce((arr, item) => {
+    return arr.concat(item);
+  }, []);
+  return newCart;
+};
+
 const addItem = (quantity, colors) => {
   if (!colors) return alert('Une couleur doit être fournie');
   const _quantity = parseInt(quantity, 10);
@@ -44,11 +57,11 @@ const addItem = (quantity, colors) => {
 
   switch (productIndex) {
     case -1: {
-      storage.setItem('cart', JSON.stringify([...cart, product]));
+      storage.setItem('cart', JSON.stringify(groupItems([...cart, product])));
       break;
     }
     default: {
-      storage.setItem('cart', JSON.stringify(cart));
+      storage.setItem('cart', JSON.stringify(groupItems(cart)));
     }
   }
 };
