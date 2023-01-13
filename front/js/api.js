@@ -24,7 +24,7 @@ export const fetchProduct = async (id) => {
 /**
  * Send a post request to order
  * @param {{contact: { firstName: string, lastName: string, adress: string, city: string, email: string},
- *  products: [{id: string, price: string, colors: [string]}]}} order
+ *  products: [{id: string}]}} order
  * @returns Promise<object | undefined>
  */
 export const postOrder = async (order) => {
