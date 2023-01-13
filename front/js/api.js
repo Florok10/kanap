@@ -1,12 +1,13 @@
 const HOST = 'localhost';
 const PORT = '3000';
+const URL = `http://${HOST}:${PORT}/api/`;
 
 /**
  * Fetch the products from our back-end api
  * @returns [{id: string, colors: [string], name: string, price: number, imageUrl: string, description: string, altTxt: string}]
  */
 export const fetchProducts = async () => {
-  const response = await fetch(`http://${HOST}:${PORT}/api/products`);
+  const response = await fetch(`${URL}products`);
   return response.json();
 };
 
@@ -16,7 +17,7 @@ export const fetchProducts = async () => {
  * @returns Promise<array | undefined>
  */
 export const fetchProduct = async (id) => {
-  const response = await fetch(`http://${HOST}:${PORT}/api/products/${id}`);
+  const response = await fetch(`${URL}products/${id}`);
   return response.json();
 };
 
@@ -27,7 +28,7 @@ export const fetchProduct = async (id) => {
  * @returns Promise<object | undefined>
  */
 export const postOrder = async (order) => {
-  const response = await fetch(`http://${HOST}:${PORT}/api/order/`, {
+  const response = await fetch(`${URL}order`, {
     method: 'POST',
     body: JSON.stringify(order),
   });
