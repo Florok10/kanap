@@ -1,3 +1,5 @@
+import { fetchProduct } from './api';
+
 const imgTag = document.getElementsByClassName('item__img')[0];
 const titleTag = document.getElementById('title');
 const priceTag = document.getElementById('price');
@@ -10,16 +12,6 @@ const storage = localStorage;
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const productId = urlParams.get('id');
-
-/**
- * Fetch the product with the given id
- * @param {string} id
- * @returns Promise<array | undefined>
- */
-const fetchProduct = async (id) => {
-  const response = await fetch(`http://localhost:3000/api/products/${id}`);
-  return response.json();
-};
 
 /**
  * After fetching the product, set the tags' content
@@ -37,7 +29,7 @@ fetchProduct(productId).then((product) => {
 
 /**
  * Group the items in the given cart by their id
- * @param {{id: string, colors: string, quantity: number | string}[]} cart
+ * @param {[{id: string, colors: string, quantity: number | string}]} cart
  * @returns array
  */
 const groupItems = (cart) => {

@@ -1,3 +1,5 @@
+import { fetchProduct } from './api';
+
 const cartItemsTag = document.getElementById('cart__items');
 const totalQuantityTag = document.getElementById('totalQuantity');
 const totalPriceTag = document.getElementById('totalPrice');
@@ -36,22 +38,8 @@ const DELETE = 'DELETE';
 const UPDATE = 'UPDATE';
 
 /**
- * Fetch the product with the given id
- * @param {string} id
- * @returns Promise<array | undefined>
- */
-const fetchProduct = async (id) => {
-  const response = await fetch(
-    `http://localhost:3000/api/products/${id}`
-  ).catch((error) => {
-    throw new Error(error);
-  });
-  return response.json();
-};
-
-/**
  * Calculate and render the number of all the products in the cart
- * @param {{id: string, colors: string, quantity: number | string}[]} cart
+ * @param {[{id: string, colors: string, quantity: number | string}]} cart
  */
 const renderTotalQuantity = (cart) => {
   totalQuantityTag.innerText = cart.reduce(
@@ -74,7 +62,7 @@ const renderTotalSum = () => {
 
 /**
  * Render both total of all products' price and  the number of all the products in the cart
- * @param {{id: string, colors: string, quantity: number | string}[]} cart
+ * @param {[{id: string, colors: string, quantity: number | string}]} cart
  */
 const renderTotalAndQuantity = (cart) => {
   renderTotalQuantity(cart);
