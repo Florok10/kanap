@@ -16,14 +16,8 @@ const addressErrorMsgTag = document.getElementById('addressErrorMsg');
 const cityErrorMsgTag = document.getElementById('cityErrorMsg');
 const emailErrorMsgTag = document.getElementById('emailErrorMsg');
 
-// const FIRST_NAME = 'FIRST_NAME';
-// const LAST_NAME = 'LAST_NAME';
-// const EMAIL = 'EMAIL';
-// const CITY = 'CITY';
-// const ADDRESS = 'ADDRESS';
-
-// const DELETE = 'DELETE';
-// const UPDATE = 'UPDATE';
+const UPDATE = 'UPDATE';
+const DELETE = 'DELETE';
 
 /**
  * Fetch the product with the given id
@@ -35,92 +29,80 @@ const fetchProduct = async (id) => {
   return response.json();
 };
 
+/**
+ * Attach an event listener to every input with a name
+ */
 document.querySelectorAll('input[name]').forEach((input) => {
-  input.addEventListener('change', (e) => {});
+  input.addEventListener('input', () => {
+    match(input);
+  });
 });
 
 /**
- * Use Regular Expressions to match the value depending of its input name
- * @param {string} value
- * @param {string} input
- * @returns boolean
+ * Use Regular Expressions to test the value of the input
+ * @param {HTMLElement} input
+ * @returns void
  */
-const match = (value, input) => {
+function match(input) {
+  const inputName = input.getAttribute('name');
+  const inputValue = input.value;
+
   const nameRegex = /^[a-zA-Z-\s]{2,}$/;
-  let result;
-  switch (input) {
-    case FIRST_NAME: {
-      result = value.test(nameRegex);
-      if (!result) {
-        firstNameErrorMsgTag.innerText =
+  const emailRegex = /^^[\w\-\.]+@[\w-]+\.+[\w-]{2,4}$/;
+  const cityRegex = /^[a-zA-Z\s-]{2,}$/;
+  const addressRegex = /^[a-zA-Z0-9\s-]$/;
+
+  let test = true;
+  let errorMsg = '';
+
+  switch (inputName) {
+    case 'firstName': {
+      test = nameRegex.test(inputValue);
+      if (!test)
+        errorMsg =
           'Le prénom ne doit pas comporter de chiffre ni de caractères spéciaux (!#@...) et être de deux caractères minimum.';
-      } else {
-        firstNameErrorMsgTag.innerText = '';
-      }
+      break;
     }
 
-    case LAST_NAME: {
-      result = !!value.match(nameRegex).length;
-      if (!result) {
-        lastNameErrorMsgTag.innerText =
+    case 'lastName': {
+      test = nameRegex.test(inputValue);
+      if (!test)
+        errorMsg =
           'Le nom ne doit pas comporter de chiffre ni de caractères spéciaux (!#@...) et être de deux caractères minimum.';
-      } else {
-        lastNameErrorMsgTag.innerText = '';
-      }
+      break;
     }
 
-    case EMAIL: {
-      result = !!value.match(/^^[\w\-\.]+@[\w-]+\.+[\w-]{2,4}$/).length;
-      if (!result) {
-        emailErrorMsgTag.innerText =
-          "L'adresse e-mail entrée n'est pas au bon format.";
-      } else {
-        emailErrorMsgTag.innerText = '';
-      }
+    case 'email': {
+      test = emailRegex.test(inputValue);
+      if (!test) errorMsg = "L'adresse e-mail entrée n'est pas au bon format.";
+      break;
     }
 
-    case CITY: {
-      result = !!value.match(/^[a-zA-Z\s-]{2,}$/).length;
-      if (!result) {
-        cityErrorMsgTag.innerText =
+    case 'city': {
+      test = cityRegex.test(inputValue);
+      if (!test)
+        errorMsg =
           'Une ville ne doit pas comporter de chiffre ni de caractères spéciaux (!#@...) et être de deux caractères minimum.';
-      } else {
-        cityErrorMsgTag.innerText = '';
-      }
+      break;
     }
 
-    case ADDRESS:
-      {
-        result = !!value.match(/^[a-zA-Z0-9\s-]$/).length;
-        if (!result) {
-          addressErrorMsgTag.innerText =
-            "L'adresse doit comporter le numéro et le libellé de la voie.";
-        } else {
-          addressErrorMsgTag.innerText = '';
-        }
-      }
-      return result;
+    case 'address': {
+      test = addressRegex.test(inputValue);
+      if (!test)
+        errorMsg =
+          "L'adresse doit compoter le numéro et le libellé de la voie.";
+      break;
+    }
   }
-};
 
-const inputTags = [
-  { tag: firstNameInputTag, name: FIRST_NAME },
-  { tag: lastNameInputTag, name: LAST_NAME },
-  { tag: addressInputTag, name: ADDRESS },
-  { tag: cityInputTag, name: CITY },
-  { tag: emailInputTag, name: EMAIL },
-];
+  const errorEl = document.querySelector(`#${inputName}ErrorMsg`);
+  errorEl.textContent = errorMsg;
+}
 
-// firstNameErrorMsgTag.innerHTML = 'Seul les lettres et espaces sont autorisés.';
-// if (!!lastNameInputTag.value.match(/^[a-zA-Z\s]{4,}$/).length) {
-//   lastNameErrorMsgTag.innerHTML = 'Seul les lettres et espaces sont autorisés';
-// }
-const matchEmail = () => {
-  if (!!emailInputTag.value.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$z/).length) {
-    emailErrorMsgTag.innerHTML = "L'adresse e-mail fournie n'est pas valide.";
-  }
-};
-
+/**
+ * Stop the propagation of the event
+ * @param {Event} e
+ */
 const handleSubmit = (e) => {
   e.stopPropagation();
 };
