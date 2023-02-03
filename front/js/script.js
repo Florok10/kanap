@@ -1,7 +1,12 @@
-import { fetchProducts } from './api';
-
 const itemsTag = document.getElementById('items');
-
+/**
+ * Fetch the products from our back-end api
+ * @returns [{id: string, colors: [string], name: string, price: number, imageUrl: string, description: string, altTxt: string}]
+ */
+const fetchProducts = async () => {
+  const response = await fetch('http://localhost:3000/api/products');
+  return response.json();
+};
 /**
  * After fetching the products, render each product found in the DOM
  */

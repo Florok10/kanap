@@ -1,5 +1,3 @@
-import { fetchProduct } from './api';
-
 const imgTag = document.getElementsByClassName('item__img')[0];
 const titleTag = document.getElementById('title');
 const priceTag = document.getElementById('price');
@@ -7,6 +5,16 @@ const descriptionTag = document.getElementById('description');
 const selectColorsTag = document.getElementById('colors');
 const quantityTag = document.getElementById('quantity');
 const addButtonTag = document.getElementById('addToCart');
+
+/**
+ * Fetch the product with the given id
+ * @param {string} id
+ * @returns Promise<array | undefined>
+ */
+const fetchProduct = async (id) => {
+  const response = await fetch(`http://localhost:3000/api/products/${id}`);
+  return response.json();
+};
 
 const storage = localStorage;
 const queryString = window.location.search;
@@ -33,16 +41,13 @@ fetchProduct(productId).then((product) => {
  * @returns array
  */
 const groupItems = (cart) => {
-  cartReduced = cart.reduce((group, item) => {
+  const cartReduced = cart.reduce((group, item) => {
     const { id } = item;
     group[id] = group[id] ?? [];
     group[id].push(item);
     return group;
   }, {});
-  const newCart = Object.values(cartReduced).reduce((arr, item) => {
-    return arr.concat(item);
-  }, []);
-  return newCart;
+  return Object.values(cartReduced).reduce((arr, item) => arr.concat(item), []);
 };
 
 /**

@@ -1,22 +1,12 @@
-import { fetchProduct } from './api';
-
 const cartItemsTag = document.getElementById('cart__items');
 const totalQuantityTag = document.getElementById('totalQuantity');
 const totalPriceTag = document.getElementById('totalPrice');
 
 const firstNameInputTag = document.getElementById('firstName');
 const lastNameInputTag = document.getElementById('lastName');
-const adressInputTag = document.getElementById('adress');
+const addressInputTag = document.getElementById('address');
 const cityInputTag = document.getElementById('city');
 const emailInputTag = document.getElementById('email');
-
-const inputsTag = [
-  firstNameInputTag,
-  lastNameInputTag,
-  adressInputTag,
-  cityInputTag,
-  emailInputTag,
-];
 
 const submitInputTag = document.getElementById('order');
 
@@ -26,16 +16,114 @@ const addressErrorMsgTag = document.getElementById('addressErrorMsg');
 const cityErrorMsgTag = document.getElementById('cityErrorMsg');
 const emailErrorMsgTag = document.getElementById('emailErrorMsg');
 
-const errorMsgsTag = [
-  firstNameErrorMsgTag,
-  lastNameErrorMsgTag,
-  addressErrorMsgTag,
-  cityErrorMsgTag,
-  emailErrorMsgTag,
+// const FIRST_NAME = 'FIRST_NAME';
+// const LAST_NAME = 'LAST_NAME';
+// const EMAIL = 'EMAIL';
+// const CITY = 'CITY';
+// const ADDRESS = 'ADDRESS';
+
+// const DELETE = 'DELETE';
+// const UPDATE = 'UPDATE';
+
+/**
+ * Fetch the product with the given id
+ * @param {string} id
+ * @returns Promise<array | undefined>
+ */
+const fetchProduct = async (id) => {
+  const response = await fetch(`http://localhost:3000/api/products/${id}`);
+  return response.json();
+};
+
+document.querySelectorAll('input[name]').forEach((input) => {
+  input.addEventListener('change', (e) => {});
+});
+
+/**
+ * Use Regular Expressions to match the value depending of its input name
+ * @param {string} value
+ * @param {string} input
+ * @returns boolean
+ */
+const match = (value, input) => {
+  const nameRegex = /^[a-zA-Z-\s]{2,}$/;
+  let result;
+  switch (input) {
+    case FIRST_NAME: {
+      result = value.test(nameRegex);
+      if (!result) {
+        firstNameErrorMsgTag.innerText =
+          'Le prénom ne doit pas comporter de chiffre ni de caractères spéciaux (!#@...) et être de deux caractères minimum.';
+      } else {
+        firstNameErrorMsgTag.innerText = '';
+      }
+    }
+
+    case LAST_NAME: {
+      result = !!value.match(nameRegex).length;
+      if (!result) {
+        lastNameErrorMsgTag.innerText =
+          'Le nom ne doit pas comporter de chiffre ni de caractères spéciaux (!#@...) et être de deux caractères minimum.';
+      } else {
+        lastNameErrorMsgTag.innerText = '';
+      }
+    }
+
+    case EMAIL: {
+      result = !!value.match(/^^[\w\-\.]+@[\w-]+\.+[\w-]{2,4}$/).length;
+      if (!result) {
+        emailErrorMsgTag.innerText =
+          "L'adresse e-mail entrée n'est pas au bon format.";
+      } else {
+        emailErrorMsgTag.innerText = '';
+      }
+    }
+
+    case CITY: {
+      result = !!value.match(/^[a-zA-Z\s-]{2,}$/).length;
+      if (!result) {
+        cityErrorMsgTag.innerText =
+          'Une ville ne doit pas comporter de chiffre ni de caractères spéciaux (!#@...) et être de deux caractères minimum.';
+      } else {
+        cityErrorMsgTag.innerText = '';
+      }
+    }
+
+    case ADDRESS:
+      {
+        result = !!value.match(/^[a-zA-Z0-9\s-]$/).length;
+        if (!result) {
+          addressErrorMsgTag.innerText =
+            "L'adresse doit comporter le numéro et le libellé de la voie.";
+        } else {
+          addressErrorMsgTag.innerText = '';
+        }
+      }
+      return result;
+  }
+};
+
+const inputTags = [
+  { tag: firstNameInputTag, name: FIRST_NAME },
+  { tag: lastNameInputTag, name: LAST_NAME },
+  { tag: addressInputTag, name: ADDRESS },
+  { tag: cityInputTag, name: CITY },
+  { tag: emailInputTag, name: EMAIL },
 ];
 
-const DELETE = 'DELETE';
-const UPDATE = 'UPDATE';
+// firstNameErrorMsgTag.innerHTML = 'Seul les lettres et espaces sont autorisés.';
+// if (!!lastNameInputTag.value.match(/^[a-zA-Z\s]{4,}$/).length) {
+//   lastNameErrorMsgTag.innerHTML = 'Seul les lettres et espaces sont autorisés';
+// }
+const matchEmail = () => {
+  if (!!emailInputTag.value.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$z/).length) {
+    emailErrorMsgTag.innerHTML = "L'adresse e-mail fournie n'est pas valide.";
+  }
+};
+
+const handleSubmit = (e) => {
+  e.stopPropagation();
+};
 
 /**
  * Calculate and render the number of all the products in the cart
@@ -86,7 +174,7 @@ const updateItems = async ({ action, product: { id, colors }, value }) => {
       const priceTag = document.querySelector(
         `article[data-id="${product.id}"][data-color="${product.colors}"] .price`
       );
-      product.quantity = value;
+      product.quantity = parseInt(value, 10);
       const fetchedProduct = await fetchProduct(product.id);
 
       priceTag.textContent = priceTag.textContent.replace(
