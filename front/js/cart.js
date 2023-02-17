@@ -2,19 +2,10 @@ const cartItemsTag = document.getElementById('cart__items');
 const totalQuantityTag = document.getElementById('totalQuantity');
 const totalPriceTag = document.getElementById('totalPrice');
 
-const firstNameInputTag = document.getElementById('firstName');
-const lastNameInputTag = document.getElementById('lastName');
-const addressInputTag = document.getElementById('address');
-const cityInputTag = document.getElementById('city');
-const emailInputTag = document.getElementById('email');
+const form = document.querySelector('form');
 
-const submitInputTag = document.getElementById('order');
-
-const firstNameErrorMsgTag = document.getElementById('firstNameErrorMsg');
-const lastNameErrorMsgTag = document.getElementById('lastNameErrorMsg');
-const addressErrorMsgTag = document.getElementById('addressErrorMsg');
-const cityErrorMsgTag = document.getElementById('cityErrorMsg');
-const emailErrorMsgTag = document.getElementById('emailErrorMsg');
+const submitBtn = document.getElementById('order');
+const inputs = document.querySelectorAll('input[name]');
 
 const UPDATE = 'UPDATE';
 const DELETE = 'DELETE';
@@ -32,80 +23,88 @@ const fetchProduct = async (id) => {
 /**
  * Attach an event listener to every input with a name
  */
-document.querySelectorAll('input[name]').forEach((input) => {
+inputs.forEach((input) => {
   input.addEventListener('input', () => {
-    match(input);
+    // Verify if all inputs are valid
+    const allInputsAreValid = Array.from(inputs).every((input) =>
+      verifyInputValue(input)
+    );
+    // If all inputs are not valid we disable the submit btn or activate it if they are valid
+    if (allInputsAreValid) {
+      submitBtn.disabled = false;
+    } else {
+      submitBtn.disabled = true;
+    }
   });
 });
 
 /**
  * Use Regular Expressions to test the value of the input
  * @param {HTMLElement} input
- * @returns void
+ * @returns boolean
  */
-function match(input) {
+function verifyInputValue(input) {
   const inputName = input.getAttribute('name');
   const inputValue = input.value;
 
   const nameRegex = /^[a-zA-Z-\s]{2,}$/;
   const emailRegex = /^^[\w\-\.]+@[\w-]+\.+[\w-]{2,4}$/;
   const cityRegex = /^[a-zA-Z\s-]{2,}$/;
-  const addressRegex = /^[a-zA-Z0-9\s-]$/;
+  const addressRegex = /^([0-9]){1,}([a-zA-Z,-\s]){8,}/;
 
-  let test = true;
-  let errorMsg = '';
+  const errorEl = document.querySelector(`#${inputName}ErrorMsg`);
+
+  let test;
+  let errorMsg;
 
   switch (inputName) {
     case 'firstName': {
       test = nameRegex.test(inputValue);
-      if (!test)
-        errorMsg =
-          'Le prénom ne doit pas comporter de chiffre ni de caractères spéciaux (!#@...) et être de deux caractères minimum.';
+      errorMsg =
+        'Le prénom ne doit pas comporter de chiffre ni de caractères spéciaux (!#@...) et être de deux caractères minimum.';
       break;
     }
 
     case 'lastName': {
       test = nameRegex.test(inputValue);
-      if (!test)
-        errorMsg =
-          'Le nom ne doit pas comporter de chiffre ni de caractères spéciaux (!#@...) et être de deux caractères minimum.';
+      errorMsg =
+        'Le nom ne doit pas comporter de chiffre ni de caractères spéciaux (!#@...) et être de deux caractères minimum.';
       break;
     }
 
     case 'email': {
       test = emailRegex.test(inputValue);
-      if (!test) errorMsg = "L'adresse e-mail entrée n'est pas au bon format.";
+      errorMsg = "L'adresse e-mail entrée n'est pas au bon format.";
       break;
     }
 
     case 'city': {
       test = cityRegex.test(inputValue);
-      if (!test)
-        errorMsg =
-          'Une ville ne doit pas comporter de chiffre ni de caractères spéciaux (!#@...) et être de deux caractères minimum.';
+      errorMsg =
+        'Une ville ne doit pas comporter de chiffre ni de caractères spéciaux (!#@...) et être de deux caractères minimum.';
       break;
     }
 
     case 'address': {
       test = addressRegex.test(inputValue);
-      if (!test)
-        errorMsg =
-          "L'adresse doit compoter le numéro et le libellé de la voie.";
+      errorMsg = "L'adresse doit compoter le numéro et le libellé de la voie.";
       break;
     }
   }
 
-  const errorEl = document.querySelector(`#${inputName}ErrorMsg`);
-  errorEl.textContent = errorMsg;
+  errorEl.textContent = !test ? errorMsg : '';
+
+  return test;
 }
 
 /**
- * Stop the propagation of the event
+ * Prevent the default behaviour of the submit and process the order
  * @param {Event} e
  */
-const handleSubmit = (e) => {
-  e.stopPropagation();
-};
+form.addEventListener('submit', (e) => {
+  order();
+  e.preventDefault();
+});
 
 /**
  * Calculate and render the number of all the products in the cart
@@ -231,3 +230,31 @@ const render = async () => {
 };
 
 render();
+
+const order = async () => {
+  debugger;
+  const formData = new FormData(form);
+  const contact = Object.fromEntries(formData.entries());
+  console.log('contact', contact);
+  //mettre les id produits dans un tableau
+  const cart = JSON.parse(localStorage.getItem('cart')).map((item) => item.id);
+  const options = {
+    method: 'POST',
+    body: JSON.stringify({ contact, products: cart }),
+    headers: { 'Content-Type': 'application/json' },
+  };
+  const response = await fetch(
+    'http://localhost:3000/api/products/order',
+    options
+  )
+    .then((res) => res.json())
+    .catch((err) => {
+      throw new Error(err);
+    });
+  let path = window.location.href;
+  path = path.replace(
+    'cart.html',
+    `confirmation.html?orderId=${response.orderId}`
+  );
+  window.location.replace(path);
+};
