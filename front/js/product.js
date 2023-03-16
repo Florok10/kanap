@@ -24,16 +24,21 @@ const productId = urlParams.get('id');
 /**
  * After fetching the product, set the tags' content
  */
-fetchProduct(productId).then((product) => {
-  document.title = product.name;
-  imgTag.innerHTML = `<img src="${product.imageUrl}" alt="${product.altTxt}" >`;
-  titleTag.textContent = product.name;
-  priceTag.textContent = product.price;
-  descriptionTag.textContent = product.description;
-  product.colors.forEach((color) => {
-    selectColorsTag.innerHTML += `<option value="${color}">${color}</option>`;
+fetchProduct(productId)
+  .then((product) => {
+    document.title = product.name;
+    imgTag.innerHTML = `<img src="${product.imageUrl}" alt="${product.altTxt}" >`;
+    titleTag.textContent = product.name;
+    priceTag.textContent = product.price;
+    descriptionTag.textContent = product.description;
+    product.colors.forEach((color) => {
+      selectColorsTag.innerHTML += `<option value="${color}">${color}</option>`;
+    });
+  })
+  .catch((err) => {
+    console.error(err);
+    document.querySelector('main').textContent = err;
   });
-});
 
 /**
  * Group the items in the given cart by their id

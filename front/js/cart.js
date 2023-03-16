@@ -188,7 +188,7 @@ const updateItems = async ({ action, product: { id, colors }, value }) => {
 };
 
 /**
- * Do the initial render
+ * Render the product list and the total for the price and quantity
  * @returns Promise<void>
  */
 const render = async () => {
@@ -251,9 +251,7 @@ const order = async () => {
     options
   )
     .then((res) => res.json().ok && response)
-    .catch((err) => {
-      console.error(err);
-    });
+    .catch(console.error);
   let path = window.location.href;
   path = path.replace(
     'cart.html',
