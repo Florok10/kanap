@@ -10,6 +10,8 @@ const inputs = document.querySelectorAll('input[name]');
 const UPDATE = 'UPDATE';
 const DELETE = 'DELETE';
 
+submitBtn.disabled = true;
+
 /**
  * Fetch the product with the given id
  * @param {string} id
@@ -29,11 +31,13 @@ inputs.forEach((input) => {
     const allInputsAreValid = Array.from(inputs).every((input) =>
       verifyInputValue(input)
     );
-    // If all inputs are not valid we disable the submit btn or activate it if they are valid
-    if (allInputsAreValid) {
+    const cart = JSON.parse(localStorage.getItem('cart'));
+    // If all inputs are not valid we disable the submit button or activate it if they are valid and the cart contains items
+    if (allInputsAreValid && cart.length) {
       submitBtn.disabled = false;
     } else {
       submitBtn.disabled = true;
+      submitBtn.style.cursor = 'default';
     }
   });
 });
@@ -232,7 +236,6 @@ const render = async () => {
 render();
 
 const order = async () => {
-  debugger;
   const formData = new FormData(form);
   const contact = Object.fromEntries(formData.entries());
   console.log('contact', contact);
@@ -247,9 +250,9 @@ const order = async () => {
     'http://localhost:3000/api/products/order',
     options
   )
-    .then((res) => res.json())
+    .then((res) => res.json().ok && response)
     .catch((err) => {
-      throw new Error(err);
+      console.error(err);
     });
   let path = window.location.href;
   path = path.replace(
