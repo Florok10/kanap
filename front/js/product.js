@@ -62,8 +62,11 @@ const groupItems = (cart) => {
  * @returns void
  */
 const addItem = (quantity, colors) => {
-  if (!colors) return alert('Une couleur doit être fournie');
-  const _quantity = parseInt(quantity, 10);
+  quantity = parseInt(quantity, 10);
+  if (!colors && !quantity)
+    return alert('Une couleur et une quantité doivent être indiquées');
+  if (!colors) return alert('Une couleur doit être indiquée');
+  if (!quantity) return alert('Une quantité doit être indiquée');
   let cart = JSON.parse(storage.getItem('cart')) || [];
 
   const productIndex = cart.findIndex(
@@ -73,7 +76,7 @@ const addItem = (quantity, colors) => {
   const product = cart[productIndex] || {};
 
   if (!product.id) product.id = productId;
-  product.quantity = (product.quantity || 0) + _quantity;
+  product.quantity = (product.quantity || 0) + quantity;
   product.colors = colors;
 
   switch (productIndex) {

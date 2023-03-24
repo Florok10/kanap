@@ -238,24 +238,28 @@ render();
 const order = async () => {
   const formData = new FormData(form);
   const contact = Object.fromEntries(formData.entries());
-  console.log('contact', contact);
-  //mettre les id produits dans un tableau
+
   const cart = JSON.parse(localStorage.getItem('cart')).map((item) => item.id);
+
   const options = {
     method: 'POST',
     body: JSON.stringify({ contact, products: cart }),
     headers: { 'Content-Type': 'application/json' },
   };
+
   const response = await fetch(
     'http://localhost:3000/api/products/order',
     options
   )
     .then((res) => res.json().ok && response)
     .catch(console.error);
+
   let path = window.location.href;
+
   path = path.replace(
     'cart.html',
     `confirmation.html?orderId=${response.orderId}`
   );
+
   window.location.replace(path);
 };
