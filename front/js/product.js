@@ -36,8 +36,16 @@ fetchProduct(productId)
     });
   })
   .catch((err) => {
+    document.title = 'Aucun article trouvé';
     console.error(err);
-    document.querySelector('main').textContent = err;
+    const main = document.querySelector('main');
+    main.style.height = '40vh';
+    main.style.display = 'flex';
+    main.style.alignItems = 'center';
+    main.style.fontSize = '32px';
+    main.style.textAlign = 'center';
+    main.style.padding = '20px';
+    main.textContent = 'Aucun article trouvé';
   });
 
 /**
