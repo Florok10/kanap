@@ -261,5 +261,7 @@ const order = async () => {
     `confirmation.html?orderId=${response.orderId}`
   );
 
+  localStorage.clear();
+
   window.location.replace(path);
 };
