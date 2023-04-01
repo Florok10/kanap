@@ -51,10 +51,10 @@ function verifyInputValue(input) {
   const inputName = input.getAttribute('name');
   const inputValue = input.value;
 
-  const nameRegex = /^[a-zA-Z-\s]{2,}$/;
+  const nameRegex = /^[a-zA-Z-àèùéâêîôû\s]{2,}$/;
   const emailRegex = /^^[\w\-\.]+@[\w-]+\.+[\w-]{2,4}$/;
-  const cityRegex = /^[a-zA-Z\s-]{2,}$/;
-  const addressRegex = /^([0-9]){1,}([a-zA-Z,-\s]){8,}/;
+  const cityRegex = /^[a-zA-Zàèùéâêîôû\s-]{2,}$/;
+  const addressRegex = /^([0-9]){1,}([a-zA-Zàèùéâêîôû,-\s]){1,}/;
 
   const errorEl = document.querySelector(`#${inputName}ErrorMsg`);
 
@@ -128,7 +128,7 @@ const renderTotalSum = () => {
   const pricesTags = document.querySelectorAll(`article .price`);
   let prices = [];
   for (let i = 0; i < pricesTags.length; i++) {
-    prices.push(parseInt(pricesTags[i].textContent.match(/[0-9]+/)[0]), 10);
+    prices.push(parseInt(pricesTags[i].textContent.match(/[0-9]+/)[0]));
   }
   totalPriceTag.innerText = prices.reduce((sum, item) => sum + item, 0);
 };
@@ -151,15 +151,29 @@ const updateItems = async ({ action, product: { id, colors }, value }) => {
   if (!cart.length) throw new Error('The cart is empty');
   const product =
     cart[cart.findIndex((item) => item.id === id && item.colors === colors)];
+
+  const deleteItem = () => {
+    cart = cart.filter((item) => !(item.id === id && item.colors === colors));
+    localStorage.setItem('cart', JSON.stringify(cart));
+    document
+      .querySelector(`article[data-id="${id}"][data-color="${colors}"]`)
+      .remove();
+    renderTotalAndQuantity(cart);
+  };
+
   switch (action) {
     case UPDATE: {
+      const quantity = parseInt(value, 10);
+      if (quantity <= 0) return deleteItem();
+
       const quantityTag = document.querySelector(
         `article[data-id="${product.id}"][data-color="${product.colors}"] .cart__item__content__settings__quantity p`
       );
       const priceTag = document.querySelector(
         `article[data-id="${product.id}"][data-color="${product.colors}"] .price`
       );
-      product.quantity = parseInt(value, 10);
+
+      product.quantity = quantity;
       const fetchedProduct = await fetchProduct(product.id);
 
       priceTag.textContent = priceTag.textContent.replace(
@@ -176,12 +190,7 @@ const updateItems = async ({ action, product: { id, colors }, value }) => {
     }
 
     case DELETE: {
-      cart = cart.filter((item) => !(item.id === id && item.colors === colors));
-      localStorage.setItem('cart', JSON.stringify(cart));
-      document
-        .querySelector(`article[data-id="${id}"][data-color="${colors}"]`)
-        .remove();
-      renderTotalAndQuantity(cart);
+      deleteItem();
       break;
     }
   }
@@ -251,7 +260,12 @@ const order = async () => {
     'http://localhost:3000/api/products/order',
     options
   )
-    .then((res) => res.json().ok && response)
+    .then((res) => {
+      if (!res.ok) {
+        return alert('Une erreur est survenue lors de la commande');
+      }
+      return res.json();
+    })
     .catch(console.error);
 
   let path = window.location.href;

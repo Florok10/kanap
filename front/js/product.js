@@ -70,11 +70,12 @@ const groupItems = (cart) => {
  * @returns void
  */
 const addItem = (quantity, colors) => {
-  quantity = parseInt(quantity, 10);
+  quantity = parseInt(quantity);
   if (!colors && !quantity)
     return alert('Une couleur et une quantité doivent être indiquées');
   if (!colors) return alert('Une couleur doit être indiquée');
-  if (!quantity) return alert('Une quantité doit être indiquée');
+  if (quantity <= 0)
+    return alert('Une quantité doit être indiquée et être au minimum 1.');
   let cart = JSON.parse(storage.getItem('cart')) || [];
 
   const productIndex = cart.findIndex(
